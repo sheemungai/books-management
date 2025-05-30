@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
+import { Profile } from '../../profiles/entities/profile.entity';
 
 @Entity()
 export class User {
@@ -11,11 +12,13 @@ export class User {
   email: string;
   @Column()
   password: string;
-  @Column()
+  @Column({ default: true })
   isActive: boolean;
 
   @Column()
   created_at: Date;
   @Column()
   update_at: Date;
+  @OneToOne(() => Profile, (profile) => profile.user)
+  profile: Profile;
 }

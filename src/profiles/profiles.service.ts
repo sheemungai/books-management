@@ -1,26 +1,59 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { Profile } from 'src/profiles/entities/profile.entity';
+import { User } from 'src/users/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProfilesService {
-  create(createProfileDto: CreateProfileDto) {
-    return 'This action adds a new profile';
+  constructor(
+    @InjectRepository(Profile) private profileRepository: Repository<Profile>,
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {}
+  async create(createProfileDto: CreateProfileDto) {
+    const profile = this.profileRepository.create(createProfileDto);
+    return this.profileRepository.save(profile);
   }
 
-  findAll() {
-    return `This action returns all profiles`;
+  async findAll() {
+    return await this.profileRepository
+      .find()
+      .then((profiles) => {
+        if (profiles.length === 0) {
+          return 'No profiles found';
+        }
+        return profiles;
+      })
+      .catch((error) => {
+        console.error('Error finding profiles:', error);
+        throw new Error('Failed to find profiles');
+      });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
+  async findOne(id: number): Promise<Profile | string> {
+    return await this.profileRepository
+      .findOne({
+        where: { id: id },
+      })
+      .then((profile) => {
+        if (!profile) {
+          return `No profile found with id ${id}`;
+        }
+        return profile;
+      })
+      .catch((error) => {
+        console.error('Error finding profile:', error);
+        throw new Error(`Failed to find profile with id ${id}`);
+      });
   }
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
+  async update(id: number, updateProfileDto: UpdateProfileDto) {
+    return await this.profileRepository.update(id, updateProfileDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} profile`;
+  async remove(id: number) {
+    return await this.profileRepository.delete(id);
   }
 }
