@@ -4,16 +4,13 @@ import { AppService } from './practice.service';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-      
     }),
-    DatabaseModule
-    
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
